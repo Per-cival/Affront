@@ -15,7 +15,23 @@ public class InputProvider : IInputProvider
 
     public IInputProvider.InputBase GetState()
     {
+        //state list: base state -> dash chain -> null
+        return DashChain(inputBase);
+    }
+
+    private IInputProvider.InputBase DashChain(IInputProvider.InputBase inputBase)
+    {
         return inputBase;
+    }
+
+    public void Release() //call to release BaseVector back to constructed original. Used to mark end of chain.
+    {
+        inputBase.BaseVector = Vector2.right;
+    }
+
+    public void Zero()
+    {
+        inputBase.BaseVector = Vector2.zero;
     }
     
 }

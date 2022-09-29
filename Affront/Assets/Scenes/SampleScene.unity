@@ -491,7 +491,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 1735902343}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 25495e072a6232946bb2587df56b24c3, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -542,7 +542,68 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  jumpHeight: 5
+  jumpHeight: 7
+  dashSpeed:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -0.6814087
+      outSlope: -0.6814087
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.07185068
+    - serializedVersion: 3
+      time: 0.03928633
+      value: 0.99987227
+      inSlope: -0.5882163
+      outSlope: -0.5882163
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.053387024
+      value: 1.0020212
+      inSlope: -0.057150953
+      outSlope: -0.057150953
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.4490987
+      value: 0.99154794
+      inSlope: -0.5453563
+      outSlope: -0.5453563
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.07154918
+    - serializedVersion: 3
+      time: 0.9377343
+      value: 0.08294228
+      inSlope: -1.3840455
+      outSlope: -1.3840455
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.08303078
+      outWeight: 0.18284328
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -4.5606
+      outSlope: -4.5606
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.049381778
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  dashScalar: 3
 --- !u!1 &1821530445
 GameObject:
   m_ObjectHideFlags: 0
