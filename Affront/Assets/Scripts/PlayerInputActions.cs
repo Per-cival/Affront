@@ -53,6 +53,15 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""8bc180b4-4457-4225-acfe-34fc1cf44d88"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -110,6 +119,17 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""action"": ""Dash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fcccfe7a-7c24-49d7-a366-5f920d7f0377"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -121,6 +141,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         m_Default_Jump = m_Default.FindAction("Jump", throwIfNotFound: true);
         m_Default_Move = m_Default.FindAction("Move", throwIfNotFound: true);
         m_Default_Dash = m_Default.FindAction("Dash", throwIfNotFound: true);
+        m_Default_Pause = m_Default.FindAction("Pause", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -183,6 +204,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Default_Jump;
     private readonly InputAction m_Default_Move;
     private readonly InputAction m_Default_Dash;
+    private readonly InputAction m_Default_Pause;
     public struct DefaultActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -190,6 +212,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Default_Jump;
         public InputAction @Move => m_Wrapper.m_Default_Move;
         public InputAction @Dash => m_Wrapper.m_Default_Dash;
+        public InputAction @Pause => m_Wrapper.m_Default_Pause;
         public InputActionMap Get() { return m_Wrapper.m_Default; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -208,6 +231,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @Dash.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnDash;
                 @Dash.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnDash;
                 @Dash.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnDash;
+                @Pause.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPause;
+                @Pause.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPause;
+                @Pause.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPause;
             }
             m_Wrapper.m_DefaultActionsCallbackInterface = instance;
             if (instance != null)
@@ -221,6 +247,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @Dash.started += instance.OnDash;
                 @Dash.performed += instance.OnDash;
                 @Dash.canceled += instance.OnDash;
+                @Pause.started += instance.OnPause;
+                @Pause.performed += instance.OnPause;
+                @Pause.canceled += instance.OnPause;
             }
         }
     }
@@ -230,5 +259,6 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
     }
 }
