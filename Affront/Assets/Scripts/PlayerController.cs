@@ -1,9 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Vector2 = UnityEngine.Vector2;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,6 +23,17 @@ public class PlayerController : MonoBehaviour
     private BoxCollider2D bc;
     private PlayerInputActions _inputActions;
     private InputAction inputActionAsset;
+    private PlayerState playerState;
+
+    private GameObject pauseHandler;
+    private MenuHandler handler;
+
+    private enum PlayerState
+    {
+        Neutral,
+        Jump,
+        Attack
+    }
 
     private void Awake()
     {
@@ -28,7 +42,13 @@ public class PlayerController : MonoBehaviour
         _inputActions = new PlayerInputActions();
         
         provider = new InputProvider();
+
+        playerState = PlayerState.Neutral;
         
+        pauseHandler = new GameObject("Pause", typeof(MenuHandler));
+        handler = pauseHandler.GetComponent<MenuHandler>();
+
+        Cursor.visible = false; //small settings like these should realistically go in a manager class, but I opted out of one because the scope is small.
 
     }
 
@@ -40,8 +60,9 @@ public class PlayerController : MonoBehaviour
         _inputActions.Default.Jump.canceled += OnJumpCancel;
         _inputActions.Default.Dash.started += OnDash;
         _inputActions.Default.Pause.started += OnPause;
+        _inputActions.Default.Attack.started += OnAttack;
 
-
+        _inputActions.Default.FullscreenToggle.started += OnFullscreenToggle;
         
         _inputActions.Enable();
     }
@@ -64,11 +85,12 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void OnJump(InputAction.CallbackContext context)
+    private void OnJump(InputAction.CallbackContext context)    
     {
         if (CanJump())
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
+            playerState = PlayerState.Jump;
         }
     }
 
@@ -78,10 +100,12 @@ public class PlayerController : MonoBehaviour
         float distance = 0.5f;
         RaycastHit2D leftHit = Physics2D.Raycast(new Vector2(bc.bounds.min.x, bc.bounds.min.y), Vector2.down, distance, mask);
         RaycastHit2D rightHit = Physics2D.Raycast(new Vector2(bc.bounds.max.x, bc.bounds.min.y), Vector2.down, distance, mask);
+        //could've used a boxcast, but this is pixel-perfect. Could easily refactor if I ever see the need to.
+        
 
         if (leftHit.collider != null && rightHit.collider != null)
         {
-            return true;
+            return true; //wanted to use ternary operator here, but doesn't quite work. Oh well, ugly code it is
         }
 
         return false;
@@ -92,34 +116,49 @@ public class PlayerController : MonoBehaviour
     }
     private void OnDash(InputAction.CallbackContext context)
     {
-        StartCoroutine(DashState());
+        if (playerState == PlayerState.Jump)
+        {
+            StartCoroutine(DashState());
+        }
+        playerState = PlayerState.Neutral;
+        //StartCoroutine(DashState());
+
     }
     private void OnPause(InputAction.CallbackContext context)
     {
-       // pauseCanvas.gameObject.SetActive(!isPaused);
-       // Time.timeScale = isPaused ? 0 : 1;
+        handler.OnPause();
+    }
+
+    private void OnAttack(InputAction.CallbackContext context)
+    {
+        //attack
+    }
+
+    private void OnFullscreenToggle(InputAction.CallbackContext context)
+    {
+        Screen.fullScreen = !Screen.fullScreen;
     }
 
     IEnumerator DashState()
     {
+        rb.gravityScale = 0;
         provider.Zero();
-        for (float i = 0; i < 5; i++) //increase i to increase dash time
+        for (float i = 0; i < 5; i++) //increase i or WaitForSeconds parameter to increase dash time
         {
-            float cachedValue = dashSpeed.Evaluate(i / 5); 
-            if (cachedValue < moveSpeed) //since cachedValue decreases over time, this prevents it from dropping too low.
-            {
-                cachedValue = moveSpeed;
-            }
-            rb.velocity = new Vector2(cachedValue * dashScalar * direction, 0f); 
+            float cachedValue = dashSpeed.Evaluate(i / 5);
+            if (cachedValue < moveSpeed) { cachedValue = moveSpeed; } //since cachedValue decreases over time, this prevents it from dropping too low.
             
+            rb.velocity = new Vector2(cachedValue * dashScalar * direction, 0f);
             yield return new WaitForSeconds(0.1f);
         }
+        rb.gravityScale = 1;
         provider.Release();
-        rb.velocity = provider.GetState().BaseVector * direction * moveSpeed;
+        //rb.velocity = provider.GetState().BaseVector * direction * moveSpeed;
+        rb.velocity = Vector2.zero;
 
     }
     #region Debug Windows
-    void OnGUI() //creates a debug window and injects player's velocity vector
+    void OnGUI() //creates a debug window and injects player's velocity vector. OnGUI is called roughly once a frame. 
     {
         GUI.Box(new Rect(1320, 0, 600f, 200f), "x-velocity: " + Math.Round(rb.velocity.x, 3) + 
         " y-velocity: " + Math.Round(rb.velocity.y, 3) );

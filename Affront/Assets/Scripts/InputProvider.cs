@@ -15,7 +15,7 @@ public class InputProvider : IInputProvider
 
     public IInputProvider.InputBase GetState()
     {
-        //state list: base state -> dash chain -> null
+        //state list: base state -> dash chain -> event chain -> null
         return DashChain(inputBase);
     }
 

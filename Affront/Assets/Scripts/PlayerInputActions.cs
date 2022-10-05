@@ -62,6 +62,24 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""d1aaef6a-ffd0-4b88-9d24-3a0b0b073080"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FullscreenToggle"",
+                    ""type"": ""Button"",
+                    ""id"": ""088086e8-bfcb-4732-9bb2-67bdac61f0ee"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -130,6 +148,28 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""action"": ""Pause"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7141fd07-2bf3-4329-85e4-1e5f42f9b140"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d7d9b9b1-242c-49f5-8fa0-14b67f15540f"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FullscreenToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -142,6 +182,8 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         m_Default_Move = m_Default.FindAction("Move", throwIfNotFound: true);
         m_Default_Dash = m_Default.FindAction("Dash", throwIfNotFound: true);
         m_Default_Pause = m_Default.FindAction("Pause", throwIfNotFound: true);
+        m_Default_Attack = m_Default.FindAction("Attack", throwIfNotFound: true);
+        m_Default_FullscreenToggle = m_Default.FindAction("FullscreenToggle", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -205,6 +247,8 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Default_Move;
     private readonly InputAction m_Default_Dash;
     private readonly InputAction m_Default_Pause;
+    private readonly InputAction m_Default_Attack;
+    private readonly InputAction m_Default_FullscreenToggle;
     public struct DefaultActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -213,6 +257,8 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Default_Move;
         public InputAction @Dash => m_Wrapper.m_Default_Dash;
         public InputAction @Pause => m_Wrapper.m_Default_Pause;
+        public InputAction @Attack => m_Wrapper.m_Default_Attack;
+        public InputAction @FullscreenToggle => m_Wrapper.m_Default_FullscreenToggle;
         public InputActionMap Get() { return m_Wrapper.m_Default; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -234,6 +280,12 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @Pause.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPause;
                 @Pause.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPause;
                 @Pause.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnPause;
+                @Attack.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnAttack;
+                @Attack.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnAttack;
+                @Attack.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnAttack;
+                @FullscreenToggle.started -= m_Wrapper.m_DefaultActionsCallbackInterface.OnFullscreenToggle;
+                @FullscreenToggle.performed -= m_Wrapper.m_DefaultActionsCallbackInterface.OnFullscreenToggle;
+                @FullscreenToggle.canceled -= m_Wrapper.m_DefaultActionsCallbackInterface.OnFullscreenToggle;
             }
             m_Wrapper.m_DefaultActionsCallbackInterface = instance;
             if (instance != null)
@@ -250,6 +302,12 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @Pause.started += instance.OnPause;
                 @Pause.performed += instance.OnPause;
                 @Pause.canceled += instance.OnPause;
+                @Attack.started += instance.OnAttack;
+                @Attack.performed += instance.OnAttack;
+                @Attack.canceled += instance.OnAttack;
+                @FullscreenToggle.started += instance.OnFullscreenToggle;
+                @FullscreenToggle.performed += instance.OnFullscreenToggle;
+                @FullscreenToggle.canceled += instance.OnFullscreenToggle;
             }
         }
     }
@@ -260,5 +318,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
+        void OnFullscreenToggle(InputAction.CallbackContext context);
     }
 }

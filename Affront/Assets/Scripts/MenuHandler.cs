@@ -5,10 +5,17 @@ using UnityEngine;
 
 public class MenuHandler : MonoBehaviour
 {
-
-    public static void OnPause()
+    public void OnPause()
     {
+        GameObject pauseGameObject = GameObject.Find("PauseGameObject");
+        Canvas PauseCanvas = pauseGameObject.transform.GetChild(0).GetComponent<Canvas>();
         
+        PauseCanvas.gameObject.SetActive(!PauseCanvas.gameObject.activeSelf);
+
+        Time.timeScale = PauseCanvas.gameObject.activeSelf ? 0 : 1;
+
+        Cursor.visible = !Cursor.visible;
+
     }
 
     public void Options()
@@ -26,7 +33,12 @@ public class MenuHandler : MonoBehaviour
         
     }
 
-    public void QuitGame()
+    public void QuitToMenu()
+    {
+        //call load, parameter of mainmenu scene
+    }
+
+    public void QuitGame() //quit and quittomainmenu
     {
         #if UNITY_EDITOR
         Application.Quit();
