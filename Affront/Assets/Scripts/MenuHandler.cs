@@ -14,10 +14,11 @@ public class MenuHandler : MonoBehaviour
 
         Time.timeScale = PauseCanvas.gameObject.activeSelf ? 0 : 1;
 
+        #if UNITY_STANDALONE
         Cursor.visible = !Cursor.visible;
+        #endif
 
     }
-
     public void Options()
     {
         
@@ -44,6 +45,7 @@ public class MenuHandler : MonoBehaviour
         Application.Quit();
         #endif
         
-        System.Diagnostics.Process.GetCurrentProcess().Kill();
+        System.Diagnostics.Process.GetCurrentProcess().Kill(); //I don't like either of these solutions.
+        //Application.Quit doesn't work for some reason, and killing current process is sudden and jarring.
     }
 }

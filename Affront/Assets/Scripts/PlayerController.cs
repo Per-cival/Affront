@@ -15,7 +15,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpHeight;
     [SerializeField] private AnimationCurve dashSpeed;
     [SerializeField] private int dashScalar;
-
+    [SerializeField] private float xVelocityJumpScalar;
+    [SerializeField] private float jumpCancelFallScalar;
+    
+    
+    private bool isDashing;
+    [SerializeField]private float dashTimer;
+    
     private InputProvider provider;
     private float direction;
     
@@ -48,7 +54,9 @@ public class PlayerController : MonoBehaviour
         pauseHandler = new GameObject("Pause", typeof(MenuHandler));
         handler = pauseHandler.GetComponent<MenuHandler>();
 
+        #if UNITY_STANDALONE
         Cursor.visible = false; //small settings like these should realistically go in a manager class, but I opted out of one because the scope is small.
+        #endif
 
     }
 
@@ -56,7 +64,7 @@ public class PlayerController : MonoBehaviour
     {
         _inputActions.Default.Move.started += OnMove;
         _inputActions.Default.Move.canceled += OnMoveCancel;
-        _inputActions.Default.Jump.performed += OnJump;
+        _inputActions.Default.Jump.started += OnJump;
         _inputActions.Default.Jump.canceled += OnJumpCancel;
         _inputActions.Default.Dash.started += OnDash;
         _inputActions.Default.Pause.started += OnPause;
@@ -66,17 +74,14 @@ public class PlayerController : MonoBehaviour
         
         _inputActions.Enable();
     }
-
-    private void FixedUpdate()
-    {
-        
-    }
-
     private void OnMove(InputAction.CallbackContext context)
     {
-        direction = context.ReadValue<float>();
-        Vector2 result = provider.GetState().BaseVector * moveSpeed * context.ReadValue<float>();
-        rb.velocity = result + new Vector2(0, rb.velocity.y); //include a timer scalar to run up to speed over time?
+        if (!isDashing)
+        {
+            direction = context.ReadValue<float>();
+            Vector2 result = provider.GetState().BaseVector * moveSpeed * context.ReadValue<float>();
+            rb.velocity = result + new Vector2(0, rb.velocity.y); //include a timer scalar to run up to speed over time?
+        }
 
     }
     private void OnMoveCancel(InputAction.CallbackContext context)
@@ -100,19 +105,19 @@ public class PlayerController : MonoBehaviour
         float distance = 0.5f;
         RaycastHit2D leftHit = Physics2D.Raycast(new Vector2(bc.bounds.min.x, bc.bounds.min.y), Vector2.down, distance, mask);
         RaycastHit2D rightHit = Physics2D.Raycast(new Vector2(bc.bounds.max.x, bc.bounds.min.y), Vector2.down, distance, mask);
-        //could've used a boxcast, but this is pixel-perfect. Could easily refactor if I ever see the need to.
+        //could've used a boxcast, will refactor if the need arises
         
 
         if (leftHit.collider != null && rightHit.collider != null)
         {
-            return true; //wanted to use ternary operator here, but doesn't quite work. Oh well, ugly code it is
+            return true; 
         }
 
         return false;
     }
     private void OnJumpCancel(InputAction.CallbackContext context)
     {
-        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
+        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y / jumpCancelFallScalar);
     }
     private void OnDash(InputAction.CallbackContext context)
     {
@@ -121,8 +126,6 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(DashState());
         }
         playerState = PlayerState.Neutral;
-        //StartCoroutine(DashState());
-
     }
     private void OnPause(InputAction.CallbackContext context)
     {
@@ -141,6 +144,7 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator DashState()
     {
+        isDashing = true;
         rb.gravityScale = 0;
         provider.Zero();
         for (float i = 0; i < 5; i++) //increase i or WaitForSeconds parameter to increase dash time
@@ -155,6 +159,7 @@ public class PlayerController : MonoBehaviour
         provider.Release();
         //rb.velocity = provider.GetState().BaseVector * direction * moveSpeed;
         rb.velocity = Vector2.zero;
+        isDashing = false;
 
     }
     #region Debug Windows
