@@ -12,6 +12,9 @@ public class MurdochAI : MonoBehaviour
     [SerializeField] private uint health;
     [SerializeField] private int damage;
     [SerializeField] private int MoveSpeed;
+    [SerializeField] private int knockbackX;
+    [SerializeField] private int knockbackY; //when the player hits this entity, the knockback applied to it in each direction
+    
     
 
     
@@ -23,6 +26,7 @@ public class MurdochAI : MonoBehaviour
     private Transform ai;
     private GameObject player;
     private BoxCollider2D bc;
+    private BoxCollider2D rangeTrigger;
     private int playerLeftOfBoss; //storing direction as integer instead of bool to directly manipulate velocity vector.
     private bool followPlayer;
     
@@ -30,9 +34,9 @@ public class MurdochAI : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         bc = GetComponent<BoxCollider2D>();
+        rangeTrigger = gameObject.transform.GetChild(0).GetComponent<BoxCollider2D>();
         ai = GetComponent<Transform>(); //caching to wrap name of variable
         player = FindObjectOfType<PlayerController>().gameObject; //generally bad, however PlayerController is a confirmed unique type
-        //so okay in this situation
         state = BaseState.Wandering;
     }
 
@@ -66,9 +70,7 @@ public class MurdochAI : MonoBehaviour
 
     private void Wander()
     {
-        //spawn at location. MoveTowards point A, then when you're at point A, MoveTowards point B. 
         rb.velocity = Vector2.zero;
-
     }
 
     private void Discover()
@@ -82,12 +84,11 @@ public class MurdochAI : MonoBehaviour
     private void Attack()
     {
         rb.velocity = Vector2.zero;
-        //cast a ray 5 units from Murdoch. If the ray returns a hit, switch enum to attack and then attack.
         //pick randomly between 3 separate attacks. Attack, pause for a short duration, and then either dash backward, jump toward player, or attack again. 
         //weight attacks so it's predetermined? like after attack 2, he always jumps at you. etc.
     }
 
-    private void OnTriggerEnter2D(Collider2D col)
+    private void OnTriggerEnter2D(Collider2D col) //uses trigger collider rather than hitbox collider, collision with OnCollisionEnter
     {
         if (col.CompareTag("Player"))
         {
@@ -104,6 +105,22 @@ public class MurdochAI : MonoBehaviour
             followPlayer = false;
             playerLeftOfBoss = 0; //remove this when I implement a real wander. This is placeholder
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D col) //this works but I need to steal movement first
+    {
+        if (playerLeftOfBoss == -1) //if player is left of boss then
+        {
+            col.rigidbody.AddForce(new Vector2(1 - (Mathf.Cos(135 * Mathf.Deg2Rad) + knockbackX), Mathf.Sin(135 * Mathf.Deg2Rad) + knockbackY), ForceMode2D.Impulse); 
+        }
+        else
+        {
+            col.rigidbody.AddForce(new Vector2(Mathf.Cos(45 * Mathf.Deg2Rad) + knockbackX, Mathf.Sin(45 * Mathf.Deg2Rad) + knockbackY), ForceMode2D.Impulse);
+
+        }
+        //this solution causes problems when the player is still moving. I need a static reference to the movement vector. Does that 100% mean singleton solution?
+        //the vector would be passed as a separate chain? Like I have an "injured" listener solved in a manager instead of here.
+        
     }
 
     private int FindPosition()

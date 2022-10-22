@@ -53,10 +53,7 @@ public class PlayerController : MonoBehaviour
         
         pauseHandler = new GameObject("Pause", typeof(MenuHandler));
         handler = pauseHandler.GetComponent<MenuHandler>();
-
-        #if UNITY_STANDALONE
-        Cursor.visible = false; //small settings like these should realistically go in a manager class, but I opted out of one because the scope is small.
-        #endif
+        
 
     }
 

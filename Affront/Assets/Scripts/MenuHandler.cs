@@ -5,30 +5,54 @@ using UnityEngine;
 
 public class MenuHandler : MonoBehaviour
 {
+    private GameObject pauseGameObject;
+    private Canvas PauseCanvas;
+    private Canvas OptionsCanvas;
+    private void Awake()
+    {
+        pauseGameObject = GameObject.Find("PauseGameObject");
+        PauseCanvas = pauseGameObject.transform.GetChild(0).GetComponent<Canvas>();
+        OptionsCanvas = pauseGameObject.transform.GetChild(1).GetComponent<Canvas>();
+
+
+    }
+
     public void OnPause()
     {
-        GameObject pauseGameObject = GameObject.Find("PauseGameObject");
-        Canvas PauseCanvas = pauseGameObject.transform.GetChild(0).GetComponent<Canvas>();
+        if (!OptionsCanvas.gameObject.activeSelf) //if options menu is not enabled, turn on pause menu.
+        {
+            PauseCanvas.gameObject.SetActive(!PauseCanvas.gameObject.activeSelf);
+            Time.timeScale = PauseCanvas.gameObject.activeSelf ? 0 : 1;
+        }
+        else
+        {
+            OptionsCanvas.gameObject.SetActive(false);
+            PauseCanvas.gameObject.SetActive(true);
+        } 
         
-        PauseCanvas.gameObject.SetActive(!PauseCanvas.gameObject.activeSelf);
-
-        Time.timeScale = PauseCanvas.gameObject.activeSelf ? 0 : 1;
-
-        #if UNITY_STANDALONE
-        Cursor.visible = !Cursor.visible;
-        #endif
+        
+        
+        
 
     }
+
     public void Options()
     {
-        
+        OptionsCanvas.gameObject.SetActive(true);
+        PauseCanvas.gameObject.SetActive(false);        
     }
-
-    public void LoadGame()
+    
+        public void LoadGame()
     {
         
     }
 
+    public void Back()
+    {
+        OptionsCanvas.gameObject.SetActive(false);
+        PauseCanvas.gameObject.SetActive(true);
+
+    }
     public void SaveGame()
     {
         

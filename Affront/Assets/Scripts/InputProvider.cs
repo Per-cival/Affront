@@ -7,7 +7,7 @@ public class InputProvider : IInputProvider
     private IInputProvider.InputBase inputBase;
     public InputProvider()
     {
-        inputBase = new IInputProvider.InputBase
+        inputBase = new IInputProvider.InputBase        
         {
             BaseVector = Vector2.right
         };
