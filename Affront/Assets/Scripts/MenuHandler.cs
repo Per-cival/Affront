@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuHandler : MonoBehaviour
 {
@@ -10,11 +11,9 @@ public class MenuHandler : MonoBehaviour
     private Canvas OptionsCanvas;
     private void Awake()
     {
-        pauseGameObject = GameObject.Find("PauseGameObject");
+        pauseGameObject = GameObject.Find("MenuGameObject");
         PauseCanvas = pauseGameObject.transform.GetChild(0).GetComponent<Canvas>();
         OptionsCanvas = pauseGameObject.transform.GetChild(1).GetComponent<Canvas>();
-
-
     }
 
     public void OnPause()
@@ -28,11 +27,18 @@ public class MenuHandler : MonoBehaviour
         {
             OptionsCanvas.gameObject.SetActive(false);
             PauseCanvas.gameObject.SetActive(true);
-        } 
-        
-        
-        
-        
+        }
+    }
+
+    public void Continue()
+    {
+        //Load save file
+    }
+
+    public void NewGame()
+    {
+        SceneManager.UnloadSceneAsync((int) Level.MainMenu);
+        SceneManager.LoadSceneAsync((int) Level.Forest, LoadSceneMode.Single);
 
     }
 
@@ -60,7 +66,9 @@ public class MenuHandler : MonoBehaviour
 
     public void QuitToMenu()
     {
-        //call load, parameter of mainmenu scene
+        SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
+        SceneManager.LoadSceneAsync((int) Level.MainMenu, LoadSceneMode.Single);
+
     }
 
     public void QuitGame() //quit and quittomainmenu

@@ -18,14 +18,13 @@ public class ResolutionHandler : MonoBehaviour
     {
         switch (dropdown.value)
         {
-            case 0 :
-                Screen.SetResolution(1920, 1080, Screen.fullScreenMode);
+            case 0 : Screen.SetResolution(1920, 1080, Screen.fullScreenMode);
                 break;
-            case 1 : Screen.SetResolution(1280, 720, false);
+            case 1 : Screen.SetResolution(1280, 720, Screen.fullScreenMode);
                 break;
-            case 2 : Screen.SetResolution(720, 480, false);
+            case 2 : Screen.SetResolution(720, 480, Screen.fullScreenMode);
                 break;
-            default: Screen.SetResolution(1920, 1080, false);
+            default: Screen.SetResolution(1920, 1080, Screen.fullScreenMode);
                 break;
         }
     }
