@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using System.Numerics;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using Vector2 = UnityEngine.Vector2;
 
 public class PlayerController : MonoBehaviour
@@ -14,9 +17,12 @@ public class PlayerController : MonoBehaviour
     private float moveSpeed;
 
     [SerializeField] private float jumpHeight;
-    [SerializeField] private AnimationCurve dashSpeed;
+    [FormerlySerializedAs("dashSpeed")] [SerializeField] private AnimationCurve dashCurve;
+    [SerializeField] private AnimationCurve jumpCurve;
     [SerializeField] private int dashScalar;
     [SerializeField] private float jumpCancelFallScalar;
+    [SerializeField] private float horizontalJumpScalar;
+    
 
     private static bool CanMove = true;
 
@@ -76,24 +82,30 @@ public class PlayerController : MonoBehaviour
     {
         if (!isDashing && CanMove)
         {
-            direction = context.ReadValue<float>();
-            Vector2 result = provider.GetState().BaseVector * moveSpeed * context.ReadValue<float>();
-            rb.velocity = result + new Vector2(0, rb.velocity.y); 
+            direction = context.ReadValue<float>(); //cached to replicate 'out' parameter since these listeners cannot be overloaded 
+            Vector2 result = provider.GetState().BaseVector * moveSpeed * direction;
+            rb.velocity = result + new Vector2(0, rb.velocity.y);
+            rb.drag = 0;
         }
     }
 
     private void OnMoveCancel(InputAction.CallbackContext context)
     {
         rb.velocity = new Vector2(0, rb.velocity.y);
+        rb.drag = 1;
     }
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        if (CanJump())
+        if (CanJump() && (int)rb.velocity.x != 0)
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
+            rb.velocity = new Vector2(moveSpeed * direction * horizontalJumpScalar, jumpHeight);
             playerState = PlayerState.Jump;
-        } 
+        }
+        else if(CanJump() )
+        {
+            rb.velocity = new Vector2(0, jumpHeight);
+        }
     }
     private bool CanJump()
     {
@@ -135,13 +147,16 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator DashState()
     {
+        _inputActions.Default.Move.performed -= OnMove;
+        _inputActions.Default.Move.canceled -= OnMoveCancel;
+
         isDashing = true;
         CanMove = false;
         rb.gravityScale = 0;
         provider.Zero();
-        for (float i = 0; i < 5; i++) //increase i or WaitForSeconds parameter to increase dash time
+        for (float i = 0; i < 5; i++) //increase i or WaitForSeconds parameter to increase dash time/distance dash will travel player
         {
-            float cachedValue = dashSpeed.Evaluate(i / 5);
+            float cachedValue = dashCurve.Evaluate(i / 5);
             if (cachedValue < moveSpeed) { cachedValue = moveSpeed; } //since cachedValue decreases over time, this prevents it from dropping too low.
             
             rb.velocity = new Vector2(cachedValue * dashScalar * direction, 0f);
@@ -151,7 +166,14 @@ public class PlayerController : MonoBehaviour
         provider.Release();
         rb.velocity = new Vector2(moveSpeed * direction, 0);
         isDashing = false;
+        _inputActions.Default.Move.performed += OnMove;
+        _inputActions.Default.Move.canceled += OnMoveCancel;
         CanMove = true;
+        if (!_inputActions.Default.Move.IsPressed())
+        {
+            rb.drag = 1.5f;
+        }
+        
     }
 
     private void FixedUpdate()

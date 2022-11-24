@@ -7016,25 +7016,7 @@ MonoBehaviour:
   jumpHeight: 10
   dashCurve:
     serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
+    m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -7051,19 +7033,38 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
-      value: 1
+      time: 0.19973755
+      value: 0.99383926
       inSlope: 0
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
+    - serializedVersion: 3
+      time: 0.6021614
+      value: 0.93591356
+      inSlope: -0.116953604
+      outSlope: -0.116953604
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1400512
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: -0.000008761883
+      inSlope: -3.7502875
+      outSlope: -3.7502875
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.10873017
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   dashScalar: 5
   jumpCancelFallScalar: 1.1
+  horizontalJumpScalar: 2
   dashTimer: 0
 --- !u!1 &1869664393
 GameObject:
