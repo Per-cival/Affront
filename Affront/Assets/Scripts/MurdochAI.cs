@@ -14,10 +14,13 @@ public class MurdochAI : MonoBehaviour
     [SerializeField] private int MoveSpeed;
     [SerializeField] private int knockbackX;
     [SerializeField] private int knockbackY; //when the player hits this entity, the knockback applied to it in each direction
-    
-    
 
-    
+    [SerializeField] private Transform pointA;
+    [SerializeField] private Transform pointB;
+    private bool arrivedAtPointA;
+
+
+
     private BaseState state;
     private AttackTypes attackTypes; //attack enum specific to each enemy, therefore no global enum
     
@@ -36,7 +39,7 @@ public class MurdochAI : MonoBehaviour
         bc = GetComponent<BoxCollider2D>();
         rangeTrigger = gameObject.transform.GetChild(0).GetComponent<BoxCollider2D>();
         ai = GetComponent<Transform>(); //caching to wrap name of variable
-        player = FindObjectOfType<PlayerController>().gameObject; //generally bad, however PlayerController is a confirmed unique type
+        player = FindObjectOfType<PlayerController>().gameObject;
         state = BaseState.Wandering;
     }
 
@@ -49,7 +52,7 @@ public class MurdochAI : MonoBehaviour
 
     private void Update()
     {
-        switch(state) //considering switching to FSM, but implementation is simple and no plans for extension
+        switch(state) //considering switching to FSM, but implementation is simple
         {
             case BaseState.Wandering :
                 Wander();
@@ -70,8 +73,9 @@ public class MurdochAI : MonoBehaviour
 
     private void Wander()
     {
-        rb.velocity = Vector2.zero;
-    }
+        float step = MoveSpeed * Time.deltaTime;
+        
+    }   
 
     private void Discover()
     {
@@ -112,6 +116,7 @@ public class MurdochAI : MonoBehaviour
         if (playerLeftOfBoss == -1) //if player is left of boss then
         {
             col.rigidbody.AddForce(new Vector2(1 - (Mathf.Cos(135 * Mathf.Deg2Rad) + knockbackX), Mathf.Sin(135 * Mathf.Deg2Rad) + knockbackY), ForceMode2D.Impulse); 
+            //how to disable movement?
         }
         else
         {

@@ -5,6 +5,7 @@ using UnityEngine;
 public class InputProvider : IInputProvider
 {
     private IInputProvider.InputBase inputBase;
+    private static bool canMove;
     public InputProvider()
     {
         inputBase = new IInputProvider.InputBase        
@@ -33,5 +34,5 @@ public class InputProvider : IInputProvider
     {
         inputBase.BaseVector = Vector2.zero;
     }
-    
+
 }
