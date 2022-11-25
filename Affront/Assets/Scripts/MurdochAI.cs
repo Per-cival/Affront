@@ -22,7 +22,7 @@ public class MurdochAI : MonoBehaviour
 
 
     private BaseState state;
-    private AttackTypes attackTypes; //attack enum specific to each enemy, therefore no global enum
+    private AttackType attackType; //attack enum specific to each enemy, therefore no global enum
     
 
     private Rigidbody2D rb;
@@ -43,7 +43,7 @@ public class MurdochAI : MonoBehaviour
         state = BaseState.Wandering;
     }
 
-    private enum AttackTypes
+    private enum AttackType
     {
         Normal,
         Heavy,
@@ -88,7 +88,7 @@ public class MurdochAI : MonoBehaviour
     private void Attack()
     {
         rb.velocity = Vector2.zero;
-        //pick randomly between 3 separate attacks. Attack, pause for a short duration, and then either dash backward, jump toward player, or attack again. 
+        attackType = (AttackType)Random.Range(0, 4);
         //weight attacks so it's predetermined? like after attack 2, he always jumps at you. etc.
     }
 
@@ -123,9 +123,6 @@ public class MurdochAI : MonoBehaviour
             col.rigidbody.AddForce(new Vector2(Mathf.Cos(45 * Mathf.Deg2Rad) + knockbackX, Mathf.Sin(45 * Mathf.Deg2Rad) + knockbackY), ForceMode2D.Impulse);
 
         }
-        //this solution causes problems when the player is still moving. I need a static reference to the movement vector. Does that 100% mean singleton solution?
-        //the vector would be passed as a separate chain? Like I have an "injured" listener solved in a manager instead of here.
-        
     }
 
     private int FindPosition()
